@@ -6,10 +6,4 @@ categories: git
 ---
 git 命令
 
- `代码内容`
- 
- (```)
-  代码...
-  代码...
-  代码...
-(```)
+Use the `printf()` function.
