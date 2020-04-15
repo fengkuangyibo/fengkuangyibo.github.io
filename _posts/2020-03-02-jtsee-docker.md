@@ -56,3 +56,42 @@ $ sudo apt-get install docker-ce docker-ce-cli containerd.io
 ```
 docker version:显示docker版本信息
 ```
+### 挂载目录
+在宿主机中创建挂载目录
+```
+mkdir -p nginx/{conf,conf.d,html,log}
+```
+挂载
+```
+docker run  --name nginx-1 -d -p 8080:80 \
+ -v /root/nginx/html:/usr/share/nginx/html \
+ -v /root/nginx/conf/nginx.conf:/etc/nginx/nginx.conf \
+ -v /root/nginx/logs:/var/log/nginx \
+ nginx
+ 命令解读：
+ name：容器的名称
+ d: 后台启动
+ p: 绑定别的端口 -p a:b 将宿主机器的a端口绑定到容器的b端口 -P 为随机绑定到端口
+ net ：绑定的网络 这里配置成host(因为对于容器内部来说也有一个ip如果不配置的话默认用容器的ip，导致访问不到)
+ v : 挂载的内容 宿主机器的文件夹：容器的文件夹
+
+```
+```
+docker run  --name nginx-test -d -p 80:80 --net host -v /root/nginx/html:/usr/share/nginx/html -v /root/nginx/conf/nginx.conf:/etc/nginx/nginx.conf -v /root/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf   -v /root/nginx/logs:/var/log/nginx nginx
+```
+
+### jenkins
+
+```
+docker run \
+  -u root \
+  --rm \
+  --name jenkins1 \
+  -d \
+  -p 49000:8080 \
+  -p 50000:50000 \
+  -v /root/jenkins_home:/var/jenkins_home \
+  -v /root/.ssh:/root/.ssh \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  jenkinsci/blueocean
+```
