@@ -30,12 +30,5 @@ categories: git
 
 可以直接使用`git commit -am "<message>"`，将所有修改，但未进stage的改动加入stage，并记录commit信息。(某种程度上相当于`git add`和`git commit -m`的组合技，前提是被改动文件已经是tracked)
 
----------------
-### svn 
-	```
-	忽略目标路径下名为bin的文件夹的命令为：
-	svn propset svn:ignore bin . 
 
-	取消这个add的，命令是：
-	svn revert --recursive example_folder
-	```
+#### git remote -v 查看远程路径

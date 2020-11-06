@@ -84,8 +84,7 @@ docker run  --name nginx-test -d -p 80:80 --net host -v /root/nginx/html:/usr/sh
 
 ```
 docker run \
-  -u root \
-  --rm \
+  --restart=always -u root \
   --name jenkins1 \
   -d \
   -p 49000:8080 \
@@ -93,5 +92,58 @@ docker run \
   -v /root/jenkins_home:/var/jenkins_home \
   -v /root/.ssh:/root/.ssh \
   -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /usr/bin/docker:/usr/bin/docker \
+  -v /usr/lib64/libltdl.so.7:/usr/lib/x86_64-linux-gnu/libltdl.so.7 \
   jenkinsci/blueocean
+```
+QA:
+docker 安装jenkins 后通过构建 执行宿主 命令？
+```
+1.在docker jenkins 生成 ssh key 把id_rsa.pub 填入宿主authorized_keys中.
+2.ssh root@192.168.0.23   < < remotessh 注意的点：<< remotessh，ssh后直到遇到remotessh这样的内容结束，remotessh可以随便修改成其他形式。在结束前，加exit退出远程节点 如果不想日志文件在本机出现可以修改配置
+3.其他命令
+```
+如何从容器内部执行宿主机的docker命令
+```
+docker run -it -d  \
+--restart=always -u root \
+-v /usr/bin/docker:/usr/bin/docker \
+-v /var/run/docker.sock:/var/run/docker.sock \
+-v /usr/lib64/libltdl.so.7:/usr/lib/x86_64-linux-gnu/libltdl.so.7
+镜像名称
+docker run 参数说明
+```
+
+```
+--restart=always #Docker重启后该容器也为随之重启
+-u root          
+#以root的身份去运行镜像(避免在容器中调用Docker命令没有权限)
+#最好使用docker用户去运行
+-v /usr/bin/docker:/usr/bin/docker
+#将宿主机的docker命令挂载到容器中
+#可以使用which docker命令查看具体位置
+#或者把挂载的参数改为: -v $(which docker):/usr/bin/docker
+-v /var/run/docker.sock:/var/run/docker.sock
+#容器中的进程可以通过它与Docker守护进程进行通信
+
+-v /usr/lib64/libltdl.so.7:/usr/lib/x86_64-linux-gnu/libltdl.so.7
+#libltdl.so.7是Docker命令执行所依赖的函数库
+#容器中library的默认目录是 /usr/lib/x86_64-linux-gnu/
+#把宿主机的libltdl.so.7 函数库挂载到该目录即可
+#可以通过whereis libltdl.so.7命令查看具体位置
+#centos7位置/usr/lib64/libltdl.so.7
+#ubuntu位置/usr/lib/x86_64-linux-gnu/libltdl.so.7
+```
+
+### mongoDB
+
+```
+docker pull mongo:latest
+docker run -itd --name mongo -p 27017:27017 mongo --auth
+
+$ docker exec -it mongo mongo admin
+# 创建一个名为 admin，密码为 123456 的用户。
+>  db.createUser({ user:'admin',pwd:'123456',roles:[ { role:'userAdminAnyDatabase', db: 'admin'}]});
+# 尝试使用上面创建的用户信息进行连接。
+> db.auth('admin', '123456')11
 ```
